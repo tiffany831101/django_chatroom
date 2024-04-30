@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "chat",
     "rest_framework",
     "channels",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
@@ -106,6 +107,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ]
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -136,5 +144,18 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [("127.0.0.1", 6379)],
         },
+    },
+}
+
+from celery.schedules import crontab
+
+
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+CELERY_BEAT_SCHEDULE = {
+    "fetch-data-every-hour": {
+        "task": "chat.tasks.my_task",
+        "schedule": 10,  # Execute every hour (in seconds)
     },
 }
